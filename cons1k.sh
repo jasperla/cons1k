@@ -36,7 +36,7 @@ else
     ldom=$1
 fi
 
-tty="dev/ttyV"$(sed -nE "s,vcctty([[:digit:]])\ .*domain\ \"${ldom}\",\1,p" ${dmesg})
+tty="/dev/ttyV"$(sed -nE "s,vcctty([[:digit:]])\ .*domain\ \"${ldom}\",\1,p" ${dmesg})
 
 if [ ! -c "${tty}" ]; then
     echo "==> Error: ${tty} does not exist."
