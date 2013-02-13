@@ -26,7 +26,7 @@ fi
 tty=$(grep domain\ \"${ldom}\" ${dmesg} | awk '{print $1}' | sed 's,vcctty,,g')
 tty="/dev/ttyV${tty}"
 
-if [ ! -r "${tty}" ]; then
+if [ ! -c "${tty}" ]; then
     echo "==> Error: ${tty} does not exist."
     exit 1
 fi
