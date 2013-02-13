@@ -24,17 +24,41 @@ if [ `arch -s` != "sparc64" ]; then
     exit 1
 fi
 
-usage() {
-    echo "$0 [ldom name]"
+usage()
+{
+    echo "usage: ${0##*/} [-d ldom | -l]"
     exit 1
 }
 
-if [ -z $1 ]; then
-    usage
-else
-    grep -qw ldom-$1 ${dmesg} || usage
-    ldom=$1
+list_ldoms()
+{
+    echo "==> Available domains:"
+    sed -nE 's,^vcctty.*domain\ \"(.*)\",\1,p' ${dmesg}
+    exit 0
+}
+
+ldom=
+lflag=0
+while getopts "ld:" flag; do
+    case "$flag" in
+	l)    lflag=1 ;;
+	d)    ldom=$OPTARG ;;
+	*)    usage() ;;
+    esac
+done
+
+[ $# -gt 0 ] || usage
+
+if [ "${lflag}" -gt "0" ]; then
+    list_ldoms
+elif [ ! -z ${ldom} ]; then
+    grep -qw ldom-${ldom} ${dmesg}
+    if [ "$?" -ne 0 ]; then
+	echo "==> Error: ${ldom} nog configured."
+	exit 1
+    fi
 fi
+
 
 tty="/dev/ttyV"$(sed -nE "s,vcctty([[:digit:]])\ .*domain\ \"${ldom}\",\1,p" ${dmesg})
 
